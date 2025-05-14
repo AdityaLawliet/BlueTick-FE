@@ -1,4 +1,6 @@
+import 'package:bluetick/Screens/home_screen.dart';
 import 'package:bluetick/Screens/mainpage.dart';
+import 'package:bluetick/token_manager.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -8,70 +10,96 @@ void main() {
 class MainApp extends StatelessWidget {
   const MainApp({super.key});
 
+  Future<Widget> _getInitialScreen() async {
+    final token = await TokenManager.getToken();
+    return token != null ? HomeScreen() : MainPage();
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        themeMode: ThemeMode.system, // Follow device theme
-        theme: ThemeData(
-          useMaterial3: true,
-          colorScheme: ColorScheme.light(
-            primary: Color(0xFF4682FF), // Blue for buttons and accents
-            onPrimary: Colors.white, // Text on primary (e.g., button text)
-            background: Colors.white, // App background
-            onBackground: Colors.black, // Normal text on background
-            surface: Colors.grey[100]!, // Container backgrounds
-            onSurface: Colors.black, // Text on containers
-            onSurfaceVariant: Colors.grey[600]!, // Secondary text
-          ),
-          textTheme: TextTheme(
-            headlineLarge: TextStyle(
-              fontSize: 40,
-              fontWeight: FontWeight.bold,
-              color: Colors.black, // Title text
-            ),
-            bodyMedium: TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w700,
-              color: Colors.black, // Button text
-            ),
-            bodySmall: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-              color: Colors.black, // Normal text
-            ),
-          ),
-          scaffoldBackgroundColor: Colors.white, // Default Scaffold background
+      themeMode: ThemeMode.system,
+      theme: ThemeData(
+        useMaterial3: true,
+        colorScheme: ColorScheme.light(
+          primary: Color(0xFF4682FF),
+          onPrimary: Colors.white,
+          background: Colors.white,
+          onBackground: Colors.black,
+          surface: Colors.grey[100]!,
+          onSurface: Colors.black,
+          onSurfaceVariant: Colors.grey[600]!,
         ),
-        darkTheme: ThemeData(
-          useMaterial3: true,
-          colorScheme: ColorScheme.dark(
-            primary: Color(0xFF4682FF), // Same blue for consistency
-            onPrimary: Colors.white, // Text on primary
-            background: Colors.black, // App background
-            onBackground: Colors.white, // Normal text on background
-            surface: Colors.grey[900]!, // Container backgrounds
-            onSurface: Colors.white, // Text on containers
-            onSurfaceVariant: Colors.grey[400]!, // Secondary text
+        textTheme: TextTheme(
+          headlineLarge: TextStyle(
+            fontSize: 40,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
           ),
-          textTheme: TextTheme(
-            headlineLarge: TextStyle(
-              fontSize: 40,
-              fontWeight: FontWeight.bold,
-              color: Colors.white, // Title text
-            ),
-            bodyMedium: TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w700,
-              color: Colors.white, // Button text
-            ),
-            bodySmall: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-              color: Colors.white, // Normal text
-            ),
+          headlineMedium: TextStyle(
+            fontSize: 30,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
           ),
-          scaffoldBackgroundColor: Colors.black, // Default Scaffold background
+          bodyMedium: TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.w700,
+            color: Colors.black,
+          ),
+          bodySmall: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+            color: Colors.black,
+          ),
         ),
-        home: MainPage());
+        scaffoldBackgroundColor: Colors.white,
+      ),
+      darkTheme: ThemeData(
+        useMaterial3: true,
+        colorScheme: ColorScheme.dark(
+          primary: Color(0xFF4682FF),
+          onPrimary: Colors.white,
+          background: Colors.black,
+          onBackground: Colors.white,
+          surface: Colors.grey[900]!,
+          onSurface: Colors.white,
+          onSurfaceVariant: Colors.grey[400]!,
+        ),
+        textTheme: TextTheme(
+          headlineLarge: TextStyle(
+            fontSize: 40,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+          headlineMedium: TextStyle(
+            fontSize: 30,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+          bodyMedium: TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.w700,
+            color: Colors.white,
+          ),
+          bodySmall: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+            color: Colors.white,
+          ),
+        ),
+        scaffoldBackgroundColor: Colors.black,
+      ),
+      home: FutureBuilder<Widget>(
+        future: _getInitialScreen(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            );
+          }
+          return snapshot.data!;
+        },
+      ),
+    );
   }
 }

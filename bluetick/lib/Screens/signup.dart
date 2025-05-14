@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'package:bluetick/Screens/home_screen.dart'; // Correct import
 import 'package:bluetick/env.dart';
+import 'package:bluetick/token_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'signin.dart';
@@ -12,7 +14,6 @@ class SignUp extends StatefulWidget {
 class _SignUpState extends State<SignUp> {
   final _formKey = GlobalKey<FormState>();
   final _phoneController = TextEditingController();
-
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -39,13 +40,16 @@ class _SignUpState extends State<SignUp> {
       final jsonResponse = jsonDecode(response.body);
 
       if (response.statusCode == 201) {
-        // Success: Navigate to SignIn
+        // Success: Store token and navigate to HomeScreen
+        final token = jsonResponse['token'];
+        await TokenManager.saveToken(token);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Registration successful! Please sign in.')),
+          SnackBar(content: Text('Registration successful!')),
         );
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => SignIn()),
+          MaterialPageRoute(
+              builder: (context) => HomeScreen()), // Correct usage
         );
       } else {
         // Failure: Show error
@@ -121,15 +125,16 @@ class _SignUpState extends State<SignUp> {
                   style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                         color: Theme.of(context).colorScheme.onBackground,
                       ),
-                  // validator: (value) {
-                  //   if (value == null || value.isEmpty) {
-                  //     return 'Please enter your phone number';
-                  //   }
-                  //   if (!RegExp(r'^\+\d{10,15}$').hasMatch(value)) {
-                  //     return 'Enter a valid phone number (e.g., +1234567890)';
-                  //   }
-                  //   return null;
-                  // },
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your phone number';
+                    }
+                    // Uncomment and adjust regex as needed
+                    // if (!RegExp(r'^\+\d{10,15}$').hasMatch(value)) {
+                    //   return 'Enter a valid phone number (e.g., +1234567890)';
+                    // }
+                    return null;
+                  },
                 ),
                 const SizedBox(height: 16),
                 TextFormField(

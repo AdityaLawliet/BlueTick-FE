@@ -1,4 +1,5 @@
 import 'package:bluetick/Screens/signin.dart';
+import 'package:bluetick/Screens/signup.dart';
 import 'package:flutter/material.dart';
 
 class MainPage extends StatefulWidget {
@@ -10,7 +11,6 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // Remove backgroundColor to use theme's scaffoldBackgroundColor
       body: Padding(
         padding: const EdgeInsets.all(12.0),
         child: Center(
@@ -24,7 +24,7 @@ class _MainPageState extends State<MainPage> {
               ),
               Text(
                 "Let's Get You In",
-                style: Theme.of(context).textTheme.headlineLarge, // Theme-aware
+                style: Theme.of(context).textTheme.headlineLarge,
               ),
               SizedBox(height: 180),
               GestureDetector(
@@ -40,16 +40,14 @@ class _MainPageState extends State<MainPage> {
                   width: double.infinity,
                   height: 60,
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primary, // Blue
+                    color: Theme.of(context).colorScheme.primary,
                     borderRadius: BorderRadius.circular(35),
                   ),
                   child: Center(
                     child: Text(
                       "Sign in with phone number",
                       style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onPrimary, // White
+                            color: Theme.of(context).colorScheme.onPrimary,
                           ),
                     ),
                   ),
@@ -62,17 +60,27 @@ class _MainPageState extends State<MainPage> {
                     TextSpan(
                       text: "Don't have an account? ",
                       style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onBackground, // Black or White
+                            color: Theme.of(context).colorScheme.onBackground,
                           ),
                     ),
-                    TextSpan(
-                      text: "Sign up",
-                      style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                            color:
-                                Theme.of(context).colorScheme.primary, // Blue
-                          ),
+                    WidgetSpan(
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => SignUp()),
+                          );
+                        },
+                        child: Text(
+                          "Sign up",
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodySmall!
+                              .copyWith(
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
+                        ),
+                      ),
                     ),
                   ],
                 ),

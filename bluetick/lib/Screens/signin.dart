@@ -1,6 +1,8 @@
 import 'dart:convert';
+import 'package:bluetick/Screens/home_screen.dart';
 import 'package:bluetick/Screens/signup.dart';
 import 'package:bluetick/env.dart';
+import 'package:bluetick/token_manager.dart'; // Import TokenManager
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -34,12 +36,14 @@ class _SignInState extends State<SignIn> {
       final jsonResponse = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
-        // Success: Navigate to HomeScreen
-        print("done");
-        // Navigator.pushReplacement(
-        //   context,
-        //   MaterialPageRoute(builder: (context) => HomeScreen()),
-        // );
+        // Success: Store token and navigate to HomeScreen
+        final token = jsonResponse['token'];
+        print(token);
+        await TokenManager.saveToken(token);
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => HomeScreen()),
+        );
       } else {
         // Failure: Show error
         ScaffoldMessenger.of(context).showSnackBar(
@@ -115,9 +119,10 @@ class _SignInState extends State<SignIn> {
                   //   if (value == null || value.isEmpty) {
                   //     return 'Please enter your phone number';
                   //   }
-                  //   if (!RegExp(r'^\+\d{10,15}$').hasMatch(value)) {
-                  //     return 'Enter a valid phone number (e.g., +1234567890)';
-                  //   }
+                  //   // Uncomment and adjust regex as needed
+                  //   // if (!RegExp(r'^\+\d{10,15}$').hasMatch(value)) {
+                  //   //   return 'Enter a valid phone number (e.g., +1234567890)';
+                  //   // }
                   //   return null;
                   // },
                 ),
@@ -167,15 +172,15 @@ class _SignInState extends State<SignIn> {
                   style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                         color: Theme.of(context).colorScheme.onBackground,
                       ),
-                  // validator: (value) {
-                  //   if (value == null || value.isEmpty) {
-                  //     return 'Please enter your password';
-                  //   }
-                  //   if (value.length < 6) {
-                  //     return 'Password must be at least 6 characters';
-                  //   }
-                  //   return null;
-                  // },
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your password';
+                    }
+                    if (value.length < 6) {
+                      return 'Password must be at least 6 characters';
+                    }
+                    return null;
+                  },
                 ),
                 const SizedBox(height: 16),
                 Container(
@@ -252,25 +257,6 @@ class _SignInState extends State<SignIn> {
               ],
             ),
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class HomeScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Home'),
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        foregroundColor: Theme.of(context).colorScheme.onPrimary,
-      ),
-      body: Center(
-        child: Text(
-          'Welcome, you are signed in!',
-          style: Theme.of(context).textTheme.headlineLarge,
         ),
       ),
     );
