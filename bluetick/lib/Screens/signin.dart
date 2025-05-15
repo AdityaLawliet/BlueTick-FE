@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:bluetick/Screens/home_screen.dart';
 import 'package:bluetick/Screens/signup.dart';
 import 'package:bluetick/env.dart';
-import 'package:bluetick/token_manager.dart'; // Import TokenManager
+import 'package:bluetick/token_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -36,23 +36,26 @@ class _SignInState extends State<SignIn> {
       final jsonResponse = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
-        // Success: Store token and navigate to HomeScreen
         final token = jsonResponse['token'];
-        print(token);
         await TokenManager.saveToken(token);
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => HomeScreen()),
         );
       } else {
-        // Failure: Show error
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(jsonResponse['message'] ?? 'Login failed')),
+          SnackBar(
+            content: Text(jsonResponse['message'] ?? 'Login failed'),
+            behavior: SnackBarBehavior.floating,
+          ),
         );
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
+        SnackBar(
+          content: Text('Error: $e'),
+          behavior: SnackBarBehavior.floating,
+        ),
       );
     } finally {
       setState(() => _isLoading = false);
@@ -69,192 +72,135 @@ class _SignInState extends State<SignIn> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Center(
-          child: Form(
-            key: _formKey,
-            child: Column(
-              children: [
-                SizedBox(height: 180),
-                Image.asset(
-                  "assets/images/bubble-chat (1).png",
-                  width: 240,
-                  height: 240,
-                ),
-                SizedBox(height: 20),
-                TextFormField(
-                  controller: _phoneController,
-                  decoration: InputDecoration(
-                    hintText: "Phone Number",
-                    hintStyle: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+          child: Center(
+            child: SingleChildScrollView(
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image.asset(
+                      "assets/images/bubble-chat (1).png",
+                      width: 200,
+                      height: 200,
+                    ),
+                    const SizedBox(height: 24),
+                    Text(
+                      'Sign In',
+                      style: Theme.of(context).textTheme.headlineMedium,
+                    ),
+                    const SizedBox(height: 32),
+                    TextFormField(
+                      controller: _phoneController,
+                      decoration: InputDecoration(
+                        labelText: "Phone Number",
+                        prefixIcon: Icon(
+                          Icons.phone,
+                          color:
+                              Theme.of(context).colorScheme.secondary, // Teal
                         ),
-                    filled: true,
-                    fillColor: Theme.of(context).colorScheme.surface,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(35),
-                      borderSide: BorderSide.none,
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(35),
-                      borderSide: BorderSide(
-                        color: Theme.of(context).colorScheme.primary,
-                        width: 1,
                       ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(35),
-                      borderSide: BorderSide(
-                        color: Theme.of(context).colorScheme.primary,
-                        width: 2,
-                      ),
-                    ),
-                  ),
-                  keyboardType: TextInputType.phone,
-                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                        color: Theme.of(context).colorScheme.onBackground,
-                      ),
-                  // validator: (value) {
-                  //   if (value == null || value.isEmpty) {
-                  //     return 'Please enter your phone number';
-                  //   }
-                  //   // Uncomment and adjust regex as needed
-                  //   // if (!RegExp(r'^\+\d{10,15}$').hasMatch(value)) {
-                  //   //   return 'Enter a valid phone number (e.g., +1234567890)';
-                  //   // }
-                  //   return null;
-                  // },
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: _passwordController,
-                  decoration: InputDecoration(
-                    hintText: "Password",
-                    hintStyle: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        ),
-                    filled: true,
-                    fillColor: Theme.of(context).colorScheme.surface,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(35),
-                      borderSide: BorderSide.none,
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(35),
-                      borderSide: BorderSide(
-                        color: Theme.of(context).colorScheme.primary,
-                        width: 1,
-                      ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(35),
-                      borderSide: BorderSide(
-                        color: Theme.of(context).colorScheme.primary,
-                        width: 2,
-                      ),
-                    ),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _obscurePassword
-                            ? Icons.visibility_off
-                            : Icons.visibility,
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          _obscurePassword = !_obscurePassword;
-                        });
+                      keyboardType: TextInputType.phone,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your phone number';
+                        }
+                        // Add phone number validation if needed
+                        // if (!RegExp(r'^\+\d{10,15}$').hasMatch(value)) {
+                        //   return 'Enter a valid phone number (e.g., +1234567890)';
+                        // }
+                        return null;
                       },
                     ),
-                  ),
-                  obscureText: _obscurePassword,
-                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                        color: Theme.of(context).colorScheme.onBackground,
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: _passwordController,
+                      decoration: InputDecoration(
+                        labelText: "Password",
+                        prefixIcon: Icon(
+                          Icons.lock,
+                          color:
+                              Theme.of(context).colorScheme.secondary, // Teal
+                        ),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _obscurePassword
+                                ? Icons.visibility_off
+                                : Icons.visibility,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _obscurePassword = !_obscurePassword;
+                            });
+                          },
+                        ),
                       ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your password';
-                    }
-                    if (value.length < 6) {
-                      return 'Password must be at least 6 characters';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-                Container(
-                  width: double.infinity,
-                  child: Text(
-                    "Continue with OTP",
-                    style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                  ),
-                ),
-                SizedBox(height: 30),
-                GestureDetector(
-                  onTap: _isLoading ? null : _signIn,
-                  child: Container(
-                    width: double.infinity,
-                    height: 60,
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primary,
-                      borderRadius: BorderRadius.circular(35),
+                      obscureText: _obscurePassword,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your password';
+                        }
+                        if (value.length < 6) {
+                          return 'Password must be at least 6 characters';
+                        }
+                        return null;
+                      },
                     ),
-                    child: Center(
+                    const SizedBox(height: 16),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: TextButton(
+                        onPressed: () {
+                          // Implement OTP login navigation or functionality
+                        },
+                        child: Text("Continue with OTP"),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    ElevatedButton(
+                      onPressed: _isLoading ? null : _signIn,
                       child: _isLoading
-                          ? CircularProgressIndicator(
-                              color: Theme.of(context).colorScheme.onPrimary,
+                          ? SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(
+                                color: Theme.of(context).colorScheme.onPrimary,
+                                strokeWidth: 2,
+                              ),
                             )
-                          : Text(
-                              "Sign in",
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyMedium!
-                                  .copyWith(
-                                    color:
-                                        Theme.of(context).colorScheme.onPrimary,
-                                  ),
-                            ),
+                          : Text("Sign In"),
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size(double.infinity, 56),
+                      ),
                     ),
-                  ),
-                ),
-                SizedBox(height: 20),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => SignUp()),
-                    );
-                  },
-                  child: RichText(
-                    text: TextSpan(
+                    const SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        TextSpan(
-                          text: "Don't have an account? ",
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodySmall!
-                              .copyWith(
-                                color:
-                                    Theme.of(context).colorScheme.onBackground,
-                              ),
+                        Text(
+                          "Don't have an account? ",
+                          style: Theme.of(context).textTheme.bodySmall,
                         ),
-                        TextSpan(
-                          text: "Sign up",
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodySmall!
-                              .copyWith(
-                                color: Theme.of(context).colorScheme.primary,
-                              ),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(builder: (context) => SignUp()),
+                            );
+                          },
+                          child: Text("Sign Up"),
                         ),
                       ],
                     ),
-                  ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
         ),
